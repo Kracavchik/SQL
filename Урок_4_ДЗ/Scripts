@@ -1,0 +1,21 @@
+use vk2;
+-- Написать скрипт, возвращающий список имен (только firstname) пользователей без повторений в алфавитном порядке
+select (firstname) from users 
+	group by (firstname)
+	order by (firstname) asc;
+	
+-- Написать скрипт, отмечающий несовершеннолетних пользователей как неактивных (поле is_active = true). 
+-- При необходимости предварительно добавить такое поле в таблицу profiles со значением по умолчанию = false (или 0)
+alter table profiles add column is_active bit default 0;
+alter table profiles add column age int default 0;
+
+update profiles
+set age = year(NOW()) - year(birthdate);
+
+update profiles
+set is_active = 1
+where age < 18;
+
+-- Написать скрипт, удаляющий сообщения «из будущего» (дата позже сегодняшней)
+delete from messages
+where date(created_at) - date(now()) > 0;
