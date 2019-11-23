@@ -1,0 +1,141 @@
+-- Пусть в таблице users поля created_at и updated_at оказались незаполненными. Заполните их текущими датой и временем.
+
+drop database if exists homework;
+create database homework;
+use homework;
+
+drop table if exists users; 
+create table users(
+	id serial primary key,
+	firstname VARCHAR(100),
+	lastname VARCHAR(100),
+	created_at datetime,
+	updated_at datetime
+);
+
+
+INSERT INTO `users` VALUES 
+('1','Sydnee','Wehner',NULL,NULL), 
+('2','Bertha','Schinner',NULL,NULL),
+('3','Oren','VonRueden',NULL,NULL),
+('4','Violet','Beier',NULL,NULL),
+('5','Octavia','Auer',NULL,NULL),
+('6','Cooper','Metz',NULL,NULL),
+('7','Christopher','Turcotte',NULL,NULL),
+('8','Kareem','Torphy',NULL,NULL),
+('9','Nick','Schmeler',NULL,NULL),
+('10','Cristobal','Jones',NULL,NULL);
+
+
+update users -- обновляю значения полей.
+set 
+`created_at` = now(),
+`updated_at` = now();
+
+-- *********************************************************************
+
+/* Таблица users была неудачно спроектирована. 
+ * Записи created_at и updated_at были заданы типом VARCHAR и в них долгое время помещались значения в формате "20.10.2017 8:10". 
+ * Необходимо преобразовать поля к типу DATETIME, сохранив введеные ранее значения.
+ */
+
+drop table if exists users;
+create table users(
+	id serial primary key,
+	firstname VARCHAR(100),
+	lastname VARCHAR(100),
+	created_at VARCHAR(100),
+	updated_at VARCHAR(100)
+);
+
+INSERT INTO `users` VALUES 
+('1','Sydnee','Wehner', '20.10.2017 8:10', '20.10.2017 8:10'), 
+('2','Bertha','Schinner','20.10.2017 8:10', '20.10.2017 8:10'),
+('3','Oren','VonRueden','20.10.2017 8:10', '20.10.2017 8:10'),
+('4','Violet','Beier','20.10.2017 8:10', '20.10.2017 8:10'),
+('5','Octavia','Auer','20.10.2017 8:10', '20.10.2017 8:10'),
+('6','Cooper','Metz','20.10.2017 8:10', '20.10.2017 8:10'),
+('7','Christopher','Turcotte','20.10.2017 8:10', '20.10.2017 8:10'),
+('8','Kareem','Torphy','20.10.2017 8:10', '20.10.2017 8:10'),
+('9','Nick','Schmeler','20.10.2017 8:10', '20.10.2017 8:10'),
+('10','Cristobal','Jones','21.12.2019 8:50', '21.12.2019 8:50');
+
+alter table users
+add column created_at2 datetime default now(),
+add column updated_at2 datetime default now();
+
+UPDATE users 
+SET created_at2 = str_to_date(created_at, "%d.%m.%Y %h:%i"),
+	updated_at2 = str_to_date(updated_at, "%d.%m.%Y %h:%i");
+
+alter table users 
+drop column created_at, 
+drop column updated_at;
+
+alter table users 
+change `created_at2` `created_at` datetime default now(),
+change `updated_at2` `updated_at` datetime default now();
+
+-- ******************************************************************
+
+/*
+ * В таблице складских запасов storehouses_products в поле value могут встречаться самые разные цифры: 0, 
+ * если товар закончился и выше нуля, если на складе имеются запасы. Необходимо отсортировать записи таким образом, 
+ * чтобы они выводились в порядке увеличения значения value. Однако, нулевые запасы должны выводиться в конце, после всех записей.
+ */
+
+drop table if exists storehouses_products ;
+create table storehouses_products (
+	id serial primary key,
+	value int
+);
+
+insert into storehouses_products (value) values 
+(0),
+(2500),
+(0),
+(30),
+(500),
+(1);
+
+select value from storehouses_products ORDER BY case WHEN value = 0 THEN '99999999999999999999' END, value;
+
+-- **********************************************************************
+
+-- Подсчитайте средний возраст пользователей в таблице users
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  `id` serial primary key,
+  `firstname` varchar(100),
+  `lastname` varchar(100),
+  `birthday` datetime DEFAULT NULL  
+);
+
+INSERT INTO `users` VALUES 
+('1','Tierra','McLaughlin','2012-03-25 16:22:55'),
+('2','Jayne','Johns','2004-04-03 07:58:57'),
+('3','Mina','Steuber','1995-09-24 21:13:10'),
+('4','Nikolas','Gerhold','1991-12-28 21:24:28'),
+('5','Gregg','Collins','1973-08-02 22:58:28'),
+('6','Viola','Hirthe','1995-01-25 13:57:32'),
+('7','Jamel','Pouros','1980-03-14 12:38:30'),
+('8','Emil','Stoltenberg','2011-05-23 15:32:33'),
+('9','Rashawn','Steuber','1979-04-26 19:53:40'),
+('10','Vance','Jerde','1978-07-29 23:11:59'); 
+
+select AVG(YEAR(now())-YEAR(birthday)) from users; 
+
+-- Подсчитайте количество дней рождения, которые приходятся на каждый из дней недели. 
+-- Следует учесть, что необходимы дни недели текущего года, а не года рождения.
+drop table if exists days;
+create table days(
+id serial primary key,
+day_of_week VARCHAR(100)
+);
+
+insert into days (day_of_week)
+select DAYNAME(MAKEDATE(2019, DAYOFYEAR(birthday))) from users;
+
+select day_of_week, COUNT(day_of_week) as `count` from days
+group by day_of_week;
