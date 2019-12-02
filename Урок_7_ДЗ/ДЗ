@@ -1,0 +1,25 @@
+use shop2;
+
+/*Составьте список пользователей users, которые осуществили хотя бы 
+ * один заказ orders в интернет магазине.
+ */
+
+select
+	u.id,
+	count(o.user_id)
+from 
+	users as u
+join
+	orders as o
+where
+	u.id = o.user_id
+group by u.id
+
+-- Выведите список товаров products и разделов catalogs, который соответствует товару.
+
+select 	
+	p.name,
+	p.catalog_id,
+	(select name from catalogs where id = p.catalog_id) as katalog
+from
+	products as p
