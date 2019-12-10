@@ -1,0 +1,29 @@
+-- В базе данных shop и sample присутствуют одни и те же таблицы, учебной базы данных. 
+-- Переместите запись id = 1 из таблицы shop.users в таблицу sample.users. Используйте транзакции.
+
+start transaction;
+
+insert into sample.users (name, birthday_at,created_at,updated_at)
+select 
+	name,
+	birthday_at,
+	created_at,
+	updated_at
+from shop.users where id = 1;
+
+delete  
+from shop.users where id = 1;
+
+commit;
+
+-- Создайте представление, которое выводит название name товарной позиции из таблицы products 
+-- и соответствующее название каталога name из таблицы catalogs.
+
+create view cat as 
+	select 
+		p.name as product_name,
+		c.name as catalog_name
+	from products as p
+	join catalogs as c on p.catalog_id = c.id
+	
+select * from cat;
