@@ -1,0 +1,91 @@
+/*
+Создайте хранимую функцию hello(), которая будет возвращать приветствие, в зависимости от текущего времени суток. 
+С 6:00 до 12:00 функция должна возвращать фразу "Доброе утро", с 12:00 до 18:00 функция должна возвращать фразу "Добрый день", 
+с 18:00 до 00:00 — "Добрый вечер", с 00:00 до 6:00 — "Доброй ночи".
+ * */
+delimiter // 
+create function hello()
+returns text deterministic
+begin 	
+	case 
+		when subtime(current_time, 06:00:00) > 00:00:00
+			and subtime(current_time, 12:00:00) < 00:00:00
+		then "Доброе утро"
+		when subtime(current_time, 12:00:00) > 00:00:00
+			and subtime(current_time, 18:00:00)	< 00:00:00
+		then "Добрый день"
+		when subtime(current_time, 18:00:00) > 00:00:00
+			and subtime(current_time, 00:00:00)	< 00:00:00				
+		then "Добрый день"
+		else "Доброй ночи"
+	end
+end
+delimiter ;
+
+
+-- **********************************************************
+
+delimiter // 
+create function hello()
+returns text deterministic
+begin 	
+	case 
+		when current_time between '12:00:00'
+			and '18:00:00'
+		then select "Доброе утро"
+		when current_time between '12:00:00'
+			and "18:00:00"
+		then select "Добрый день"
+		when current_time between '18:00:00'
+			and '00:00:00'
+		then select "Добрый день"
+		else select "Доброй ночи"
+	end;
+end //
+delimiter ;
+
+select subtime(current_time, '06:00:00')
+
+-- В таблице products есть два текстовых поля: name с названием товара и description с его описанием. 
+-- Допустимо присутствие обоих полей или одно из них. Ситуация, когда оба поля принимают неопределенное значение NULL неприемлема. 
+-- Используя триггеры, добейтесь того, чтобы одно из этих полей или оба поля были заполнены. При попытке присвоить полям NULL-значение необходимо отменить операцию.
+
+delimiter // 
+create trigger dsc_null_ins before insert on products
+for each row
+begin
+	declare std_dscr text;
+	select 'Стандартное описание' into std_dscr;
+	set new.description = coalesce(new.description, std_dscr);
+end//
+delimiter ;
+
+delimiter // 
+create trigger dsc_null_upd before update on products
+for each row
+begin
+	declare std_dscr text;
+	select 'Стандартное описание' into std_dscr;
+	set new.description = coalesce(new.description, std_dscr);
+end//
+delimiter ;
+
+delimiter // 
+create trigger name_null_ins before insert on products
+for each row
+begin
+	declare std_name varchar(255);
+	select 'Стандартное имя' into std_name;
+	set new.name = coalesce(new.name, std_name);
+end//
+delimiter ;
+
+delimiter // 
+create trigger name_null_upd before update on products
+for each row
+begin
+	declare std_name varchar(255);
+	select 'Стандартное имя' into std_name;
+	set new.name = coalesce(new.name, std_name);
+end//
+delimiter ;
