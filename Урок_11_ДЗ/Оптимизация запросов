@@ -1,0 +1,25 @@
+create table logs (
+	table_name varchar(255),
+	table_id int,
+	name varchar(255),
+	created_at datetime default current_timestamp
+) ENGINE=Archive;
+
+DELIMETR //
+create trigger ins_user_log after insert on users
+for each row
+begin
+	insert into logs (tablename, table_id, name) values ('users', new.id, new.name);
+end//
+
+create trigger ins_catalog_log after insert on catalogs
+for each row
+begin
+	insert into logs (tablename, table_id, name) values ('catalogs', new.id, new.name);
+end//
+
+create trigger ins_products_log after insert on products
+for each row
+begin
+	insert into logs (tablename, table_id, name) values ('products', new.id, new.name);
+end//
