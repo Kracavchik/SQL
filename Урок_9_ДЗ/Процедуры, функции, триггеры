@@ -5,21 +5,21 @@
  * */
 delimiter // 
 create function hello()
-returns text deterministic
-begin 	
+returns tinytext deterministic
+begin 
+	declare `hour` INT;
+	set `hour` = hour(now());
 	case 
-		when subtime(current_time, 06:00:00) > 00:00:00
-			and subtime(current_time, 12:00:00) < 00:00:00
-		then "Доброе утро"
-		when subtime(current_time, 12:00:00) > 00:00:00
-			and subtime(current_time, 18:00:00)	< 00:00:00
-		then "Добрый день"
-		when subtime(current_time, 18:00:00) > 00:00:00
-			and subtime(current_time, 00:00:00)	< 00:00:00				
-		then "Добрый день"
-		else "Доброй ночи"
-	end
-end
+		when `hour` between 0 and 5 then
+			return "Доброй ночи";
+		when `hour` between 6 and 11 then
+			return "Доброе утро";
+		when `hour` between 12 and 17 then
+			return "Добрый день";
+		when `hour` between 18 and 23 then
+			return "Добрый вечер";
+	end case;
+end//
 delimiter ;
 
 
